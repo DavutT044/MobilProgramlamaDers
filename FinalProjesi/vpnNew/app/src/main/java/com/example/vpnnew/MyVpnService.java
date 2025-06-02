@@ -1,63 +1,36 @@
 package com.example.vpnnew;
 
+import android.content.Intent;
 import android.net.VpnService;
 import android.os.ParcelFileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import android.util.Log;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class MyVpnService extends VpnService {
 
-    private ParcelFileDescriptor vpnInterface;
+    private static final String TAG = "MyVpnService";
+    private ParcelFileDescriptor vpnInterface = null;
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-    }
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "VPN servisi başlatılıyor...");
 
-    @Override
-    public int onStartCommand(android.content.Intent intent, int flags, int startId) {
-        if (vpnInterface == null) {
-            startVpn();
-        }
-        return START_STICKY;
-    }
-
-    private void startVpn() {
         Builder builder = new Builder();
-        builder.setMtu(1500);
-        builder.addAddress("10.0.0.2", 24);
-        builder.addRoute("0.0.0.0", 0);
-        builder.addDnsServer("8.8.8.8");
 
-        vpnInterface = builder.establish();
-
-        if (vpnInterface != null) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    runVpnLoop();
-                }
-            }).start();
-        }
-    }
-
-    private void runVpnLoop() {
-        FileInputStream inputStream = new FileInputStream(vpnInterface.getFileDescriptor());
-        FileOutputStream outputStream = new FileOutputStream(vpnInterface.getFileDescriptor());
-        ByteBuffer buffer = ByteBuffer.allocate(32767);
+        builder.setSession("VPNNewService")
+                .addAddress("10.0.2.0", 24)
+                .addDnsServer("8.8.8.8")
+                .addRoute("0.0.0.0", 0); // Tüm trafiği yönlendir
 
         try {
-            while (true) {
-                int length = inputStream.read(buffer.array());
-                if (length > 0) {
-                    outputStream.write(buffer.array(), 0, length);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            vpnInterface = builder.establish();
+            Log.i(TAG, "VPN bağlantısı kuruldu.");
+        } catch (Exception e) {
+            Log.e(TAG, "VPN kurulurken hata oluştu: ", e);
         }
+
+        return START_STICKY;
     }
 
     @Override
@@ -66,10 +39,11 @@ public class MyVpnService extends VpnService {
         try {
             if (vpnInterface != null) {
                 vpnInterface.close();
+                vpnInterface = null;
+                Log.i(TAG, "VPN bağlantısı sonlandırıldı.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "VPN bağlantısı kapatılırken hata: ", e);
         }
-        vpnInterface = null;
     }
 }

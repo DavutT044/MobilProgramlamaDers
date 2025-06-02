@@ -5,34 +5,45 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@drawable/background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
         android:padding="20dp">
+
+        <!-- Yeni Eklenen Giriş Bilgisi TextView -->
+        <TextView
+            android:id="@+id/welcomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hoş geldiniz, [Kullanıcı]"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:textColor="#FFFFFF" />
 
         <TextView
             android:id="@+id/statusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:text="VPN Durumu: Bağlı Değil"
-            android:textSize="18sp"
-            android:padding="10dp" />
+            android:textSize="18sp" />
 
         <ImageButton
             android:id="@+id/myButton"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:background="@drawable/default_button"
+            android:contentDescription="VPN Connect Button"
             android:src="@drawable/turnonoff0"
             android:textAllCaps="false"
             android:textSize="18sp"
-            android:contentDescription="VPN Connect Button"
-            app:backgroundTint="@null"
-            />
+            app:backgroundTint="@null" />
 
     </LinearLayout>
 </RelativeLayout>
